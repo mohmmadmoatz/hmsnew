@@ -1,0 +1,42 @@
+@font-face {
+  font-family: Vazir;
+  src: url('Tajawal-Regular.ttf');
+  font-weight: normal;
+  font-display:swap;
+}
+
+@font-face {
+  font-family: Vazir;
+  src: url('Tajawal-Bold.ttf');
+
+  font-weight: bold;
+  font-display:swap;
+}
+
+@font-face {
+  font-family: Vazir;
+  src: url('Tajawal-Regular');
+  font-weight: 100;
+  font-display:swap;
+}
+
+@font-face {
+  font-family: Vazir;
+  src: url('Tajawal-Medium.ttf');
+  font-weight: 300;
+  font-display:swap;
+}
+
+@font-face {
+  font-family: Vazir;
+  src: url('Tajawal-Medium.ttf');
+  font-weight: 500;
+  font-display:swap;
+}
+
+@font-face {
+  font-family: Vazir;
+  src: url('Tajawal-ExtraBold.ttf');
+  font-weight: 900;
+  font-display:swap;
+}

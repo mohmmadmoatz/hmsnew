@@ -1,0 +1,17 @@
+[0;1;31m●[0m mariadb.service - MariaDB 10.3.29 database server
+     Loaded: loaded (/lib/systemd/system/mariadb.service; enabled; vendor preset: enabled)
+     Active: [0;1;31mfailed[0m (Result: exit-code) since Fri 2022-06-17 14:34:23 UTC; 6s ago
+       Docs: man:mysqld(8)
+             https://mariadb.com/kb/en/library/systemd/
+    Process: 1264 ExecStartPre=/usr/bin/install -m 755 -o mysql -g root -d /var/run/mysqld (code=exited, status=0/SUCCESS)
+    Process: 1276 ExecStartPre=/bin/sh -c systemctl unset-environment _WSREP_START_POSITION (code=exited, status=0/SUCCESS)
+    Process: 1279 ExecStartPre=/bin/sh -c [ ! -e /usr/bin/galera_recovery ] && VAR= ||   VAR=`cd /usr/bin/..; /usr/bin/galera_recovery`; [ $? -eq 0 ]   && systemctl set-environment _WSREP_START_POSITION=$VAR || exit 1 (code=exited, status=0/SUCCESS)
+    Process: 1334 ExecStart=/usr/sbin/mysqld $MYSQLD_OPTS $_WSREP_NEW_CLUSTER $_WSREP_START_POSITION [0;1;31m(code=exited, status=1/FAILURE)[0m
+   Main PID: 1334 (code=exited, status=1/FAILURE)
+     Status: "MariaDB server is down"
+
+Jun 17 14:34:21 HMS systemd[1]: Starting MariaDB 10.3.29 database server...
+Jun 17 14:34:21 HMS mysqld[1334]: 2022-06-17 14:34:21 0 [Note] /usr/sbin/mysqld (mysqld 10.3.29-MariaDB-0ubuntu0.20.04.1) starting as process 1334 ...
+Jun 17 14:34:23 HMS systemd[1]: [0;1;39m[0;1;31m[0;1;39mmariadb.service: Main process exited, code=exited, status=1/FAILURE[0m
+Jun 17 14:34:23 HMS systemd[1]: [0;1;38;5;185m[0;1;39m[0;1;38;5;185mmariadb.service: Failed with result 'exit-code'.[0m
+Jun 17 14:34:23 HMS systemd[1]: [0;1;31m[0;1;39m[0;1;31mFailed to start MariaDB 10.3.29 database server.[0m

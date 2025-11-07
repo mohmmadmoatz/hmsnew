@@ -1,0 +1,41 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateOperationHoldsTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('operation_holds', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('patinet_id');
+            $table->bigInteger('user_id');
+            $table->bigInteger('doctor_id');
+            $table->bigInteger('operation_price');
+            $table->string('operation_name');
+            $table->string('doctorexp');
+            $table->string('helper');
+            $table->string('m5dr');
+            $table->string('helperm5dr');
+            $table->string("operation_type");
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('operation_holds');
+    }
+}
