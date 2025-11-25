@@ -43,7 +43,11 @@
             <tr>
                 <td>{{$item->wasl_number}}</td>
                 <td>{{$item->Patient->id ??""}}</td>
-                <td>{{$item->Patient->name ??""}}</td>
+                <td
+                
+                @if($item->redirect == 8) style="color: red;" @endif
+                
+                >{{$item->Patient->name ??""}}</td>
 
               
             

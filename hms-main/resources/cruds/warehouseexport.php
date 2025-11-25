@@ -4,7 +4,7 @@ return [
     'model' => App\Models\WarehouseExport::class,
 
     // searchable fields, if you dont want search feature, remove it
-    'search' => ["name","date","total"],
+    'search' => ["name","date","total","menu_no"],
 
     // Manage actions in crud
     'create' => true,
@@ -20,6 +20,7 @@ return [
     'validation' => [
         'name' => 'required',
         'date' => 'required',
+        'menu_no' => 'required|unique:warehouse_exports,menu_no',
     ],
 
     // Write every fields in your db which you want to have a input

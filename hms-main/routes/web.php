@@ -149,8 +149,13 @@ Route::get('/companyreport', function () {
     return view('printed.companyreport');
 })->name("companyreport");
 
+Route::get('/materialreport', function () {
+    return view('printed.materialreport');
+})->name("materialreport");
 
-
+Route::get('/warehousestatement', function () {
+    return view('printed.warehousestatement');
+})->name("warehousestatement");
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 

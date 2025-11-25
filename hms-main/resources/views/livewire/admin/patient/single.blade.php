@@ -3,8 +3,9 @@
     <td> {{ $patient->name }} </td>
     
     <td> {{ $patient->phone }} </td>
+    <td> {{ $patient->by_user_id ? $patient->by_user->name : "" }} </td>
     <td> {{ $patient->stage->name  ??""}} </td>    
-
+  
     <td>
         @if($patient->checkout_at)
         <span class="badge badge-success">تم اخراج المريض من الغرفة  : 

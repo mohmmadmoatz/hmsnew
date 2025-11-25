@@ -88,7 +88,7 @@
                     <!-- Age Input (readonly, calculated from DOB) -->
                     <div class='form-group'>
                         <label for='inputage' class='control-label'> {{ __('العمر') }}</label>
-                        <input readonly type='text' wire:model.lazy='age'
+                        <input  type='text' wire:model.lazy='age'
                             class="form-control" id='inputage' placeholder="سيتم حسابه تلقائياً">
                     </div>
                 </div>

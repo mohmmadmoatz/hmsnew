@@ -57,12 +57,26 @@
                             </select>
                 </div>
 
+                <div class="col-md-12 mt-3 " wire:ignore>
+                    <label for='inputproduct' class='control-label'> {{ __('المادة') }}</label>
+                        <select data-live-search="true" class="selectpicker form-control @error('product') is-invalid @enderror" id='product'  wire:model.lazy='product'>
+                                <option value=""></option>
+                                @foreach(App\Models\Warehouseproduct::orderBy('name')->get() as $item)
+                                <option value="{{$item->id}}">{{$item->name}}</option>
+                                @endforeach
+                            </select>
+                </div>
+
                 <div class="col-md-6 mt-4">
                     <a  class="btn btn-info btn-block" href="@route('stockreport')?cat={{$name}}&dates={{$daterange}}" target="_blank" rel="noopener noreferrer">كشف</a>
                 </div>
 
                 <div class="col-md-6 mt-4">
                     <a  class="btn btn-info btn-block" href="@route('companyreport')?cat={{$company}}&dates={{$daterange}}" target="_blank" rel="noopener noreferrer">كشف</a>
+                </div>
+
+                <div class="col-md-12 mt-4">
+                    <a  class="btn btn-success btn-block" href="@route('materialreport')?product={{$product}}&dates={{$daterange}}" target="_blank" rel="noopener noreferrer">كشف حسب المادة</a>
                 </div>
 
             </div>

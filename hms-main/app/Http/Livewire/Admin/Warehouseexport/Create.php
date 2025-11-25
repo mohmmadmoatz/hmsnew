@@ -29,7 +29,9 @@ class Create extends Component
     public $qtyInput;
     public $productID;
     protected $rules = [
-        'name' => 'required',        'date' => 'required',        
+        'name' => 'required',
+        'date' => 'required',
+     //   'menu_no' => 'required|unique:warehouse_exports,menu_no',
     ];
 
     public function addItem()
@@ -84,6 +86,18 @@ class Create extends Component
         }
     }
 
+     if($this->menu_no){
+       
+        $existing = WarehouseExport::where('menu_no', $this->menu_no)
+           
+            ->exists();
+
+        if($existing){
+            
+            $this->addError('menu_no', __('رقم القائمة موجود'));
+            return;
+        }
+     }
 
         $this->validate();
 

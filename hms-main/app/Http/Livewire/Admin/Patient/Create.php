@@ -40,7 +40,7 @@ class Create extends Component
     public $husbandname;
     public $idSingle;
     public $iddate;
-    public $idcreatejeha;
+    public $idcreatejeha = "مديرية الجنسية والمعلومات الموحدة";
     public $identity_number;
     public $hms_nsba;
     public $redirect_doctor_id;
@@ -150,7 +150,7 @@ class Create extends Component
             'identity_number'=>$this->identity_number,
             'hms_nsba'=>$this->hms_nsba,
             'redirect_doctor_id'=>$this->redirect_doctor_id,
-                       
+            'by_user_id'=>auth()->user()->id ?? null,           
         ]);
 
         $this->dispatchBrowserEvent('open-window', ['url' => route('printcard').'?id=' . $this->patinfo->id]);
@@ -187,7 +187,7 @@ class Create extends Component
                 'identity_number'=>$this->identity_number,
                 'hms_nsba'=>$this->hms_nsba,
                 'redirect_doctor_id'=>$this->redirect_doctor_id,
-                           
+                 'by_user_id'=>auth()->user()->id ?? null,           
             ]);
 
             Redirect::create([

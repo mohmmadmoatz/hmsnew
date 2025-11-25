@@ -1,10 +1,17 @@
 <tr x-data="{ modalIsOpen : false }">
     <td> {{ $warehouse->supplier_name }} </td>
     <td> {{ $warehouse->date }} </td>
+    <td>{{ $warehouse->stock_no }}</td>
     <td> 
     <a target="blank" href="{{asset('storage/'.$warehouse->image)}}">
     {{ $warehouse->menu_no }} </a>
-    
+    @if($warehouse->paid)
+        <hr>
+        <span class="badge badge-success">تم التسديد</span>
+    @else
+        <hr>
+        <span class="badge badge-danger">غير مسدد</span>
+    @endif
     </td>
     <td style="color:green;font-weight:bold"> @convert($warehouse->total) </td>
     <td> {{ $warehouse->address }} </td>

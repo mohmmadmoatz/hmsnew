@@ -22,7 +22,8 @@ class Update extends Component
     public $phone;
     public $address;
     public $image;
-    
+    public $stock_no;
+    public $notes;   
 
     public $item;
     public $amount;
@@ -37,7 +38,10 @@ class Update extends Component
     public $items = [];
     
     protected $rules = [
-        'supplier_name' => 'required',        'date' => 'required',        'menu_no' => 'required',        
+        'supplier_name' => 'required',
+        'date' => 'required',
+        'menu_no' => 'required',
+        'notes' => 'nullable|string|max:1000',
     ];
 
     public function addItem()
@@ -87,7 +91,9 @@ class Update extends Component
         $this->menu_no = $this->warehouse->menu_no;
         $this->phone = $this->warehouse->phone;
         $this->address = $this->warehouse->address;
-        $this->image = $this->warehouse->image;   
+        $this->image = $this->warehouse->image;
+        $this->stock_no = $this->warehouse->stock_no;
+        $this->notes = $this->warehouse->notes;
         $this->items =  WarehouseItem::where("warehouses_id",$this->warehouse->id)->get();
         $this->items  = $this->items->toarray(); 
 
@@ -104,6 +110,21 @@ class Update extends Component
 
     public function update()
     {
+        // Check if menu_no is unique for supplier_name in current year (excluding current record)
+        if ($this->supplier_name && $this->menu_no) {
+            $currentYear = date('Y');
+            $existing = Warehouse::where('supplier_name', $this->supplier_name)
+                ->where('menu_no', $this->menu_no)
+                ->whereYear('date', $currentYear)
+                ->where('id', '!=', $this->warehouse->id)
+                ->exists();
+
+            if ($existing) {
+                $this->addError('menu_no', __('رقم القائمة موجود لهذا المورد في السنة الحالية'));
+                return;
+            }
+        }
+
         $this->validate();
 
         $this->dispatchBrowserEvent('show-message', ['type' => 'success', 'message' => __('UpdatedMessage', ['name' => __('Warehouse') ]) ]);
@@ -120,6 +141,8 @@ class Update extends Component
             'address' => $this->address,
             'image' => $this->image,
             'user_id' => auth()->id(),
+            'stock_no' => $this->stock_no,
+            'notes' => $this->notes,
         ]);
 
         WarehouseItem::where("warehouses_id",$this->warehouse->id)->delete();

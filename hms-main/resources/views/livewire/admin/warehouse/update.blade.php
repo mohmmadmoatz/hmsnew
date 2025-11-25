@@ -15,7 +15,7 @@
         <div class="card-body">
 
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <!-- Supplier_name Input -->
                     <div class='form-group' wire:ignore>
                         <label for='inputsupplier_name' class=' control-label'>
@@ -35,7 +35,7 @@
 
                 </div>
 
-                <div class="col-md-4">
+                <div class="col-md-3">
                         <!-- Date Input -->
             <div class='form-group'>
                 <label for='inputdate' class=' control-label'> {{ __('Date') }}</label>
@@ -46,7 +46,7 @@
                 </div>
 
 
-                <div class="col-md-4">
+                <div class="col-md-3">
                       <!-- Menu_no Input -->
             <div class='form-group'>
                 <label for='inputmenu_no' class=' control-label'> {{ __('Menu_no') }}</label>
@@ -54,6 +54,11 @@
                     id='inputmenu_no'>
                 @error('menu_no') <div class='invalid-feedback'>{{ $message }}</div> @enderror
             </div>
+                </div>
+
+                <div class="col-md-3">
+                    <label for="">رقم الادخال المخزني</label>
+                    <input type="text" class="form-control" wire:model.lazy="stock_no">
                 </div>
 
                 <div class="col-md-6">
@@ -67,7 +72,7 @@
                 </div>
 
                 <div class="col-md-6">
-    
+
 
             <!-- Address Input -->
             <div class='form-group'>
@@ -78,6 +83,14 @@
             </div>
                 </div>
 
+            </div>
+
+            <!-- Notes Input -->
+            <div class='form-group'>
+                <label for='inputnotes' class=' control-label'> {{ __('ملاحظات') }}</label>
+                <textarea wire:model.lazy='notes'
+                    class="form-control @error('notes') is-invalid @enderror" rows="3"></textarea>
+                @error('notes') <div class='invalid-feedback'>{{ $message }}</div> @enderror
             </div>
 
             <hr>

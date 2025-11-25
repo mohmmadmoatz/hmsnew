@@ -11,16 +11,16 @@
                         <li class="breadcrumb-item active">طلبات المخزن</li>
                     </ul>
 
-                    <div class="row justify-content-between mt-4 mb-4">
+                    <div class="row  mt-4 mb-4">
                     @if( Auth::user()->user_type  == "stockmanagment" ||  Auth::user()->user_type  == "superadmin" )
                         @if(config('easy_panel.crud.warehouseexport.create'))
-                        <div class="col-md-4 right-0">
+                        <div class="col-md-3 right-0">
                             <a href="@route(getRouteName().'.warehouseexport.create')" class="btn btn-success">انشاء طلب جديد</a>
                         </div>
                         @endif
                         @endif
                         @if(config('easy_panel.crud.warehouseexport.search'))
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="input-group">
                                 <input type="text" class="form-control" @if(config('easy_panel.lazy_mode')) wire:model.lazy="search" @else wire:model="search" @endif placeholder="{{ __('Search') }}" value="{{ request('search') }}">
                                 <div class="input-group-append">
@@ -31,19 +31,30 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
+                            <div class="input-group">
+                                <input type="text" class="form-control" @if(config('easy_panel.lazy_mode')) wire:model.lazy="menu_no_search" @else wire:model="menu_no_search" @endif placeholder="رقم القائمة" value="{{ request('menu_no_search') }}">
+                                <div class="input-group-append">
+                                    <button class="btn btn-default">
+                                        <a wire:target="menu_no_search" wire:loading.remove><i class="fa fa-search"></i></a>
+                                        <a wire:loading wire:target="menu_no_search"><i class="fas fa-spinner fa-spin" ></i></a>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
                             <div class="input-group" wire:ignore>
-                           
+
                                 <select data-live-search="true" class="form-control selectpicker" wire:model.lazy="product">
                                     <option value="">كشف حسب المادة</option>
                                     @foreach(App\Models\Warehouseproduct::get()  as $item)
                                     <option value="{{$item->id}}">{{$item->name}}</option>
-                                    
+
                                     @endforeach
                                 </select>
                             </div>
                         </div>
-                        
+
                         @endif
                     </div>
                 </div>

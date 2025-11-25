@@ -47,6 +47,11 @@ class Patient extends Model
          return $this->belongsTo("App\Models\Operation", 'opration_id');
      }
 
+
+     public function by_user()
+     {
+         return $this->belongsTo("App\Models\User", 'by_user_id');
+     }
      
 
 

@@ -66,15 +66,22 @@ class LabStockMovement extends Model
     // Accessors
     public function getMovementTypeLabelAttribute(): string
     {
-        return match($this->movement_type) {
-            'in' => 'وارد',
-            'out' => 'صادر',
-            'adjustment' => 'تعديل',
-            'transfer' => 'تحويل',
-            'return' => 'إرجاع',
-            'waste' => 'هدر',
-            default => $this->movement_type,
-        };
+        switch ($this->movement_type) {
+            case 'in':
+                return 'وارد';
+            case 'out':
+                return 'صادر';
+            case 'adjustment':
+                return 'تعديل';
+            case 'transfer':
+                return 'تحويل';
+            case 'return':
+                return 'إرجاع';
+            case 'waste':
+                return 'هدر';
+            default:
+                return $this->movement_type;
+        }
     }
 
     public function getIsIncreaseAttribute(): bool

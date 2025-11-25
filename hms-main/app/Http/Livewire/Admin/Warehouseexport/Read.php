@@ -14,8 +14,9 @@ class Read extends Component
     protected $paginationTheme = 'bootstrap';
 
     public $search;
+    public $menu_no_search;
 
-    protected $queryString = ['search'];
+    protected $queryString = ['search', 'menu_no_search'];
 
     protected $listeners = ['warehouseexportDeleted'];
 
@@ -45,7 +46,10 @@ class Read extends Component
             $data->where(function (Builder $query) use ($array){
                 foreach ($array as $item) {
                     if(!is_array($item)) {
-                        $query->orWhere($item, 'like', '%' . $this->search . '%');
+                        // Skip menu_no from general search since we have separate input
+                        if($item !== 'menu_no') {
+                            $query->orWhere($item, 'like', '%' . $this->search . '%');
+                        }
                     } else {
                         $query->orWhereHas(array_key_first($item), function (Builder $query) use ($item) {
                             $query->where($item[array_key_first($item)], 'like', '%' . $this->search . '%');
@@ -53,6 +57,11 @@ class Read extends Component
                     }
                 }
             });
+        }
+
+        // Separate search for menu_no
+        if($this->menu_no_search) {
+            $data->where('menu_no', 'like', '%' . $this->menu_no_search . '%');
         }
 
         if($this->sortColumn) {

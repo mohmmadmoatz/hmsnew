@@ -11,6 +11,7 @@ use App\Models\Patient;
 use App\Models\User;
 use App\Models\OperationHold;
 use App\Models\Redirect;
+use App\Models\Warehouse;
 
 class Create extends Component
 {
@@ -45,7 +46,12 @@ class Create extends Component
     public $patinfo;
     public $selected =false;
 
-    protected $queryString = ['payment_type','account_type','account_id','amount_iqd','daterange','payto','redirect','stname','stid','redirect_doctor_id','paydoctor','date','rid'];
+    // Warehouse properties
+    public $supplier_names = [];
+    public $selected_warehouses = [];
+    public $warehouse_total = 0;
+
+    protected $queryString = ['payment_type','account_type','account_id','amount_iqd','daterange','payto','redirect','stname','stid','redirect_doctor_id','paydoctor','date','rid','supplier_names'];
 
     
     protected $rules = [
@@ -87,6 +93,53 @@ class Create extends Component
         $this->patinfo = "";
         $this->selected = false;
         $this->patinet_id = "";
+    }
+
+    public function updatedSupplierNames()
+    {
+        $this->selected_warehouses = [];
+        $this->calculateWarehouseTotal();
+    }
+
+    public function updatedSelectedWarehouses()
+    {
+        $this->calculateWarehouseTotal();
+    }
+
+    public function calculateWarehouseTotal()
+    {
+        $this->warehouse_total = 0;
+        if (!empty($this->selected_warehouses)) {
+            $warehouses = Warehouse::whereIn('id', $this->selected_warehouses)->get();
+            $this->warehouse_total = $warehouses->sum('total');
+
+            // Auto-generate description
+            
+            $this->description = "تسديد القوائم (موردين المخزن)";
+        } else {
+            $this->description = "";
+        }
+        $this->amount_iqd = $this->warehouse_total;
+    }
+
+    public function selectAllWarehouses()
+    {
+        if (count($this->selected_warehouses) == count($this->getUnpaidWarehouses())) {
+            $this->selected_warehouses = [];
+        } else {
+            $this->selected_warehouses = $this->getUnpaidWarehouses()->pluck('id')->toArray();
+        }
+        $this->calculateWarehouseTotal();
+    }
+
+    public function getUnpaidWarehouses()
+    {
+        if (!empty($this->supplier_names)) {
+            return Warehouse::whereIn('supplier_name', $this->supplier_names)
+                          ->where('paid', false)
+                          ->get();
+        }
+        return collect();
     }
 
     public function initDirect()
@@ -266,6 +319,10 @@ class Create extends Component
 
         }else if($this->account_type ==3){
             $data['account_name'] = $this->account_id;
+        }else if($this->account_type ==4){
+            // Warehouse payment
+         //   $data['supplier_names'] = json_encode($this->supplier_names);
+           // $data['warehouse_ids'] = json_encode($this->selected_warehouses);
         }
 
         if($this->stname){
@@ -273,6 +330,11 @@ class Create extends Component
         }
 
           $printid =   Payments::create($data);
+
+        // Mark selected warehouses as paid
+        if($this->account_type == 4 && !empty($this->selected_warehouses)){
+            Warehouse::whereIn('id', $this->selected_warehouses)->update(['paid' => true,'paid_id'=>$printid->id]);
+        }
 
         $setting = Setting::find(1);
 
@@ -396,9 +458,10 @@ class Create extends Component
 
     public function render()
     {
-    
-        
-        return view('livewire.admin.payments.create')
-            ->layout('admin::layouts.app', ['title' => __('CreateTitle', ['name' => __('Payments') ])]);
+        $unpaidWarehouses = $this->getUnpaidWarehouses();
+
+        return view('livewire.admin.payments.create', [
+            'unpaidWarehouses' => $unpaidWarehouses
+        ])->layout('admin::layouts.app', ['title' => __('CreateTitle', ['name' => __('Payments') ])]);
     }
 }

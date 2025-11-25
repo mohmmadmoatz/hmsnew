@@ -33,6 +33,7 @@
                                 <option value="1">طبيب</option>
                                 <option value="2">مريض</option>
                                 <option value="3">نقدي</option>
+                                <option value="4">مخزن</option>
                         </select>
                         @error('account_type') <div class='invalid-feedback'>{{ $message }}</div> @enderror
                     </div>
@@ -85,10 +86,71 @@
 
                     </div>
                 </div>
+
+                <div class="col-md-6" wire:ignore x-show="account_type ==4">
+                    <div class='form-group'>
+                        <label for='supplier_names' class=' control-label'>الموردين</label>
+                        <select @if($daterange) disabled @endif class="form-control selectpicker" multiple data-live-search="true" wire:model.lazy="supplier_names">
+                            @foreach(App\Models\Warehouse::where('paid', false)->distinct('supplier_name')->pluck('supplier_name') as $supplier)
+                            <option value="{{$supplier}}">{{$supplier}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
        
 
             </div>
-            
+
+            @if($account_type == 4 && !empty($supplier_names))
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>قوائم المخزن غير المدفوعة للموردين المحددين</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th><input type="checkbox" wire:click="selectAllWarehouses" @if(count($selected_warehouses) == $unpaidWarehouses->count()) checked @endif></th>
+                                            <th>المورد</th>
+                                            <th>رقم القائمة</th>
+                                            <th>التاريخ</th>
+                                            <th>المجموع</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($unpaidWarehouses as $warehouse)
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" wire:model="selected_warehouses" value="{{ $warehouse->id }}">
+                                            </td>
+                                            <td>{{ $warehouse->supplier_name }}</td>
+                                            <td>
+                                                <a target="_blank" href="{{ asset('storage/'.$warehouse->image) }}">
+                                                    {{ $warehouse->menu_no }}
+                                                </a>
+                                            </td>
+                                            <td>{{ $warehouse->date }}</td>
+                                            <td class="text-success font-weight-bold">@convert($warehouse->total)</td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th colspan="4" class="text-right">المجموع المحدد:</th>
+                                            <th class="text-success font-weight-bold">@convert($warehouse_total)</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
+
             <!-- Payment_type Input -->
             <div class='form-group'>
                 <label for='inputpayment_type' class='col-sm-2 control-label'>نوع السند</label>

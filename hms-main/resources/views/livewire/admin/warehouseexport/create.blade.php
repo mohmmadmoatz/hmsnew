@@ -44,8 +44,9 @@
                 </div>
 
                 <div class="col-md-4">
-                    <label for="">رقم القائمة</label>
-                    <input type="text" class="form-control" wire:model.lazy="menu_no">
+                    <label for="menu_no">رقم القائمة</label>
+                    <input type="text" class="form-control @error('menu_no') is-invalid @enderror" wire:model.lazy="menu_no" id="menu_no">
+                    @error('menu_no') <div class='invalid-feedback'>{{ $message }}</div> @enderror
                 </div>
            
                 <div class="col-md-12">

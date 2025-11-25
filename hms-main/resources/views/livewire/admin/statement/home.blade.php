@@ -264,6 +264,15 @@
                     </div>
 
                     <div class="col-md-12">
+
+                        <a href="@route(getRouteName().'.'.'stockreport'.'.read')" target="_blank" class="btn btn-outline-info btn-block" >كشف المخزن</a>
+                    </div>
+
+                    <div class="col-md-12 py-2">
+                        <a href="@route('warehousestatement')?daterange={{$daterange}}" target="_blank" class="btn btn-info btn-block">كشف حسابات المخزن</a>
+                    </div>
+
+                    <div class="col-md-12">
                         <hr>
                     </div>
                     <div class="col-md-12">

@@ -19,6 +19,7 @@ class Create extends Component
     public $phone;
     public $address;
     public $image;
+    public $notes;
 
     public $item;
     public $amount;
@@ -29,9 +30,15 @@ class Create extends Component
     public $unit;
     public $qtyInput;
     public $items = [];
+    public $qtynow;
+
+    public $stock_no;
     
     protected $rules = [
-        'supplier_name' => 'required',        'date' => 'required',        'menu_no' => 'required',        
+        'supplier_name' => 'required',
+        'date' => 'required',
+        'menu_no' => 'required',
+        'notes' => 'nullable|string|max:1000',
     ];
 
     public function updated($input)
@@ -89,15 +96,29 @@ class Create extends Component
 
             if($this->productID){
                 $this->addItem();
-               
+
                 $this->totalmenu = 0;
                 $this->total = $this->qty *  $this->amount;
                 foreach ($this->items as $item) {
                    $this->totalmenu+= $item['total'];
                 }
-               
+
         }
     }
+
+        // Check if menu_no is unique for supplier_name in current year
+        if ($this->supplier_name && $this->menu_no) {
+            $currentYear = date('Y');
+            $existing = Warehouse::where('supplier_name', $this->supplier_name)
+                ->where('menu_no', $this->menu_no)
+                ->whereYear('date', $currentYear)
+                ->exists();
+
+            if ($existing) {
+                $this->addError('menu_no', __('رقم القائمة موجود لهذا المورد في السنة الحالية'));
+                return;
+            }
+        }
 
         $this->validate();
 
@@ -116,6 +137,8 @@ class Create extends Component
             'image' => $this->image,
             'total' => $this->totalmenu,
             'user_id' => auth()->id(),
+            'stock_no' => $this->stock_no,
+            'notes' => $this->notes,
         ]);
      
         foreach ($this->items as $item) {

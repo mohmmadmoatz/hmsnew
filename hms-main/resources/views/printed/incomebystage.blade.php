@@ -6,6 +6,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
     type="text/css">
   <link rel="stylesheet" href="theme.css" type="text/css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <style>
@@ -98,6 +99,35 @@
 
     $usd = $usd->select(DB::raw('SUM(amount_usd - return_usd) as amount_usd'))->first()->amount_usd;
 
+    // Daily breakdown
+    $dailyData = [];
+    $startDate = new DateTime($date1);
+    $endDate = new DateTime($date2);
+    $interval = new DateInterval('P1D');
+    $dateRange = new DatePeriod($startDate, $interval, $endDate->modify('+1 day'));
+
+    foreach ($dateRange as $date) {
+        $currentDate = $date->format('Y-m-d');
+
+        $dayPayments = App\Models\Payments::where("payment_type", 2)
+            ->whereDate("date", $currentDate)
+            ->where("redirect", $st);
+
+        if ($doctor) {
+            $dayPayments = $dayPayments->where("redirect_doctor_id", $doctor);
+        }
+
+        $dayPayments = $dayPayments->get();
+
+        if ($dayPayments->count() > 0) {
+            $dailyData[$currentDate] = [
+                'payments' => $dayPayments,
+                'total_iqd' => $dayPayments->sum('amount_iqd') - $dayPayments->sum('return_iqd'),
+                'total_usd' => $dayPayments->sum('amount_usd') - $dayPayments->sum('return_usd'),
+            ];
+        }
+    }
+
     @endphp
 
   <div class="py-2">
@@ -128,7 +158,7 @@
                     </th>
                     <th class="no-print">
                       @if($stage->doctor_price)
-                      <a href="@route('expfromstage')?stage={{$stage->id}}&daterange={{$dates}}&type=doctor&doctor_id={{$doctor}}">كشف اجور الطبيب</a> / 
+                      <a href="@route('expfromstage')?stage={{$stage->id}}&daterange={{$dates}}&type=doctor&doctor_id={{$doctor}}">كشف اجور الطبيب</a> /
                       @endif
                       @if($stage->other_price)
                       <a href="@route('expfromstage')?stage={{$stage->id}}&daterange={{$dates}}&type=nurse">كشف اجور الممرضة</a>
@@ -137,82 +167,175 @@
                 </tr>
         </table>
 
-        <hr>
-        <table class="table table-bordered table-striped">
-          <thead>
-            <tr>
-              <th>رقم الوصل</th>
-              <th>التاريخ</th>
-              <th>اسم المريض</th>
-              <th>المبلغ</th>
-              <th>مرجع</th>
-              <th>العملية</th>
-          </tr>
-          </thead>
-              
-                @foreach($data as $item)
+        @if(count($dailyData) > 1)
+        <div class="text-center my-3">
+            <button id="toggleView" class="btn btn-primary no-print">
+                <i class="fa fa-exchange"></i> عرض التقرير اليومي
+            </button>
+        </div>
+        @endif
+
+        <div id="detailedView">
+            <hr>
+            <h4>التفاصيل</h4>
+            <table class="table table-bordered table-striped">
+              <thead>
                 <tr>
-                    <td>{{$item->wasl_number}}</td>
-                    <td>{{$item->date}}</td>
-                    <td>{{$item->patient->name ?? ""}}</td>
-                  
-                    <td>
-                        @convert($item->amount_iqd) د.ع
-                      
-                       /
-                       @convert($item->amount_usd) $
+                  <th>رقم الوصل</th>
+                  <th>التاريخ</th>
+                  <th>اسم المريض</th>
+                  <th>المبلغ</th>
+                  <th>مرجع</th>
+                  <th>العملية</th>
+              </tr>
+              </thead>
 
-                
-                    </td>
-                    <td>
-                        @convert($item->return_iqd) د.ع
-                      
-                       /
-                       @convert($item->return_usd) $
+                    @foreach($data as $item)
+                    <tr>
+                        <td>{{$item->wasl_number}}</td>
+                        <td>{{$item->date}}</td>
+                        <td>{{$item->patient->name ?? ""}}</td>
 
-                
-                    </td>
-                    <td>{{$item->description}}</td>
+                        <td>
+                            @convert($item->amount_iqd) د.ع
+
+                           /
+                           @convert($item->amount_usd) $
+
+
+                        </td>
+                        <td>
+                            @convert($item->return_iqd) د.ع
+
+                           /
+                           @convert($item->return_usd) $
+
+
+                        </td>
+                        <td>{{$item->description}}</td>
+                    </tr>
+                    @endforeach
+                    <tr>
+                        <td colspan="3">المجموع</td>
+                        <td style="font-weight: bold;">
+
+
+
+                            @convert($data->sum("amount_iqd")) د.ع
+
+                            /
+                            @convert($data->sum("amount_usd")) $
+
+
+
+                        </td>
+                        <td style="font-weight: bold;">
+                        @convert($data->sum("return_iqd")) د.ع
+
+/
+@convert($data->sum("return_usd")) د.ع
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                      <td colspan="3">الصافي</td>
+
+                      <td colspan="4" style="font-weight: bold;">
+                         @convert($iqd) د.ع
+
+                        /
+                        @convert($usd) $</td>
+                    </tr>
+            </table>
+        </div>
+
+        @if(count($dailyData) > 1)
+        <div id="dailyView" style="display: none;">
+            <hr>
+            <h4>التقرير اليومي</h4>
+            <table class="table table-bordered table-striped">
+              <thead>
+                <tr>
+                  <th>التاريخ</th>
+                  <th>عدد المعاملات</th>
+                  <th>إجمالي المبلغ</th>
+                </tr>
+              </thead>
+              <tbody>
+                @foreach($dailyData as $date => $dayInfo)
+                <tr>
+                  <td>{{ $date }}</td>
+                  <td>{{ count($dayInfo['payments']) }}</td>
+                  <td style="font-weight: bold;">
+                    @convert($dayInfo['total_iqd']) د.ع / @convert($dayInfo['total_usd']) $
+                  </td>
                 </tr>
                 @endforeach
                 <tr>
-                    <td colspan="3">المجموع</td>
-                    <td style="font-weight: bold;">
-
-                      
-
-                        @convert($data->sum("amount_iqd")) د.ع
-
-                        / 
-                        @convert($data->sum("amount_usd")) $
-                      
-                      
-                    </td>
-                    <td style="font-weight: bold;">
-                    @convert($data->sum("return_iqd")) د.ع
-
-/ 
-@convert($data->sum("return_usd")) د.ع
-                    </td>
-                    <td></td>
+                  <td colspan="2" style="font-weight: bold;">المجموع الكلي</td>
+                  <td style="font-weight: bold;">
+                    @convert($iqd) د.ع / @convert($usd) $
+                  </td>
                 </tr>
+              </tbody>
+            </table>
+        </div>
+        @endif
+
+        @if(count($dailyData) > 1)
+        
+        <div id="dailyReportSection" style="display: none;">
+            <hr>
+            <h4 style="text-align:right">التقرير اليومي</h4>
+            <table class="table table-bordered table-striped">
+              <thead>
                 <tr>
-                  <td colspan="3">الصافي</td>
-              
-                  <td colspan="4" style="font-weight: bold;">     
-                     @convert($iqd) د.ع
-
-                    / 
-                    @convert($usd) $</td>
+                  <th>التاريخ</th>
+                  <th>عدد المعاملات</th>
+                  <th>إجمالي المبلغ</th>
                 </tr>
-        </table>
+              </thead>
+              <tbody>
+                @foreach($dailyData as $date => $dayInfo)
+                <tr>
+                  <td>{{ $date }}</td>
+                  <td>{{ count($dayInfo['payments']) }}</td>
+                  <td style="font-weight: bold;">
+                    @convert($dayInfo['total_iqd']) د.ع / @convert($dayInfo['total_usd']) $
+                  </td>
+                </tr>
+                @endforeach
+              </tbody>
+            </table>
+        </div>
+        @endif
 
-      
-     
+
     </div>
   </div>
 
-  
+
+<script>
+$(document).ready(function() {
+    $('#toggleView').click(function() {
+        var $button = $(this);
+        var $detailedView = $('#detailedView');
+        var $dailyView = $('#dailyView');
+
+        if ($detailedView.is(':visible')) {
+            $detailedView.fadeOut(300, function() {
+                $dailyView.fadeIn(300);
+            });
+            $button.html('<i class="fa fa-list"></i> عرض التفاصيل');
+        } else {
+            $dailyView.fadeOut(300, function() {
+                $detailedView.fadeIn(300);
+            });
+            $button.html('<i class="fa fa-exchange"></i> عرض التقرير اليومي');
+        }
+    });
+});
+</script>
 
 
 </body>

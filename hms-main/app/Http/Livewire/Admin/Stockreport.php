@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Admin;
 
 use App\Models\Stocksup;
+use App\Models\Warehouseproduct;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -23,6 +24,7 @@ class Stockreport extends Component
     public $sortColumn;
     public $name;
     public $company;
+    public $product;
     public $daterange;
     public $datefilterON;
 

@@ -38,6 +38,12 @@ class Labpatcreate extends Component
 
     public $patinfo;
 
+    public $inter_at;
+
+    public $qty;
+
+    public $total;
+    
     protected $rules = [
         'name' => 'required',
        // 'dob' => 'nullable|date|before:today',
