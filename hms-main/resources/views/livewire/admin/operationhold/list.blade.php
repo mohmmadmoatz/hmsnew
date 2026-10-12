@@ -35,6 +35,16 @@
                         </div>
                      
                         <div class="col-md-4">
+                            <label for="">الطبيب</label>
+                            <select class="form-control" wire:model="doctor_id">
+                                <option value="">كل الاطباء</option>
+                                @foreach($doctors as $doctor)
+                                <option value="{{$doctor->id}}">{{$doctor->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
                             <label for="">الفترة</label>
                                 <div class="input-group">
                                     <input autocomplete="off" type="text" id="reportrange" onchange="daterangeGo()"  class="form-control" wire:model.lazy="daterange"
@@ -53,7 +63,7 @@
     
                             </div>
 
-                            <div class="col-md-8">
+                            <div class="col-md-4">
                                 <label for="">اشعار بتهئية مريض</label>
                                  <select class="form-control" wire:model.lazy="room">
                                         <option value="">يرجى اختيار المريض</option>
@@ -65,7 +75,7 @@
                             </div>
 
                             <div class="col-md-12 mt-4">
-                                <a href="@route('opreport')?daterange={{$daterange}}" class="btn btn-warning btn-block">طباعة </a>
+                                <a href="@route('opreport')?daterange={{$daterange}}&doctor={{$doctor_id}}" class="btn btn-warning btn-block">طباعة </a>
                             </div>
                             
                       
@@ -114,23 +124,49 @@ table.table-fit tbody td, table.table-fit tfoot td {
                         @endif
                     </tr>
 
-                    @foreach($operationholds as $operationhold)
-                    <tr x-data="{ modalIsOpen : false}">
+                    {{-- مرضى كملوا الطبلة وبعدهم ما دافعين: تظهر بالصفحة الاولى فقط --}}
+                    @if($operationholds->currentPage() == 1)
+                    @foreach($unpaid as $rd)
+                    <tr wire:key="unpaid-{{$rd->id}}">
+                    <td> - </td>
+                    <td> {{ $rd->Patient->inter_at ?? optional($rd->created_at)->format('Y-m-d') }} </td>
+                    <td> {{ $rd->Patient->name ?? "" }} <span class="badge badge-danger">غير مدفوع</span> </td>
+                    <td> {{ $rd->Patient->doctor->name ?? "" }} </td>
+                    <td> {{ $rd->Patient->operation->name ?? "" }} </td>
+                    <td> <small class="text-muted">بعد الدفع</small> </td>
+                    <td>
+                        <a  href="@route(getRouteName().'.lab.read')?patient_id={{$rd->Patient->id??''}}" target="_blank" >الفحوصات</a>
+                        | <a  href="@route('printedForm')?id={{$rd->Patient->id??''}}" target="_blank" >فتح الطبلة</a>
+                        @if($rd->Patient->room ?? null)
+                        <span class="badge badge-secondary">{{$rd->Patient->room->name}}</span>
+                        @endif
+                    </td>
+                    </tr>
+                    @endforeach
+                    @endif
 
-                    
+                    @foreach($operationholds as $operationhold)
+                    <tr x-data="{ modalIsOpen : false}" wire:key="op-{{$operationhold->id}}">
+
+
                     <td> {{ $operationhold->id }} </td>
                     <td> {{ $operationhold->date }} </td>
-                    <td> {{ $operationhold->Patient->name ??"" }} </td>
+                    <td> {{ $operationhold->Patient->name ??"" }} <span class="badge badge-success">مدفوع</span> </td>
                     <td> {{ $operationhold->doctor->name ?? "" }} </td>
-                    
+
                     <td> {{$operationhold->operation_name}} </td>
-                    
+
                     <td>
                     @if(!$operationhold->ware_id)
-    <a  target="_blank" href="@route(getRouteName().'.operationhold.exp')?opid={{$operationhold->id}}" class="btn btn-danger">مصاريف العملية</a> 
+    <a  target="_blank" href="@route(getRouteName().'.operationhold.exp')?opid={{$operationhold->id}}" class="btn btn-danger">مصاريف العملية</a>
     @else
     <a  target="_blank" href="@route(getRouteName().'.warehouseexport.update', ['warehouseexport' => $operationhold->ware_id])" class="btn btn-warning">مصاريف العملية</a>
     @endif
+                    @if($operationhold->ligasure_count || $operationhold->pack_count)
+                    <div class="mt-1">
+                        <small>ليكاشور: {{ $operationhold->ligasure_count ?? 0 }} | باك: {{ $operationhold->pack_count ?? 0 }}</small>
+                    </div>
+                    @endif
                     </td>
 
                     <td>

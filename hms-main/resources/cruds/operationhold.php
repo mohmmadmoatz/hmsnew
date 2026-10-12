@@ -4,7 +4,7 @@ return [
     'model' => App\Models\OperationHold::class,
 
     // searchable fields, if you dont want search feature, remove it
-    'search' => ["operation_name","patinet_id",['patient'=>"name"]],
+    'search' => ["operation_name","patinet_id",['patient'=>"name"],['doctor'=>"name"]],
 
     // Manage actions in crud
     'create' => false,

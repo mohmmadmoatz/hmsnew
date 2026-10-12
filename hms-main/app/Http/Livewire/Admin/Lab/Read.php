@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Patient;
+use App\Models\Redirect;
+use App\Models\Payments;
 class Read extends Component
 {
     use WithPagination;
@@ -78,11 +80,44 @@ class Read extends Component
             });
         }
 
-        if($this->patient_id){
-            $data = $data->where("patient_id",$this->patient_id);
-        }
+        $pending = collect();
 
-        $data = $data->where('is_second',auth()->user()->is_second);
+        if($this->patient_id){
+            // فحوصات مريض محدد: نعرض كل فحوصاته من المختبرين
+            $data = $data->where("patient_id",$this->patient_id);
+
+            // الفحوصات المطلوبة الي بعد ما انطت نتيجة
+            $redirects = Redirect::where("pat_id",$this->patient_id)
+                ->whereNotNull("lab")
+                ->whereNull("labhide")
+                ->latest("id")
+                ->get();
+
+            foreach ($redirects as $rd) {
+                $tests = json_decode($rd->lab, true);
+                if(!is_array($tests) || !count($tests)){
+                    continue;
+                }
+
+                if(!$rd->paid){
+                    $status = "بانتظار الدفع";
+                }else{
+                    $payment = Payments::where("rid",$rd->id)->latest("id")->first();
+                    if($payment && $payment->redirect_done){
+                        continue; // النتيجة موجودة بالجدول
+                    }
+                    $status = "بانتظار النتيجة";
+                }
+
+                $pending->push([
+                    "date" => optional($rd->created_at)->format('Y-m-d H:i'),
+                    "tests" => collect($tests)->pluck("name")->filter()->implode(" ، "),
+                    "status" => $status,
+                ]);
+            }
+        }else{
+            $data = $data->where('is_second',auth()->user()->is_second);
+        }
 
         if($this->sortColumn) {
             $data->orderBy($this->sortColumn, $this->sortType);
@@ -93,7 +128,8 @@ class Read extends Component
         $data = $data->paginate(config('easy_panel.pagination_count', 15));
 
         return view('livewire.admin.lab.read', [
-            'labs' => $data
+            'labs' => $data,
+            'pending' => $pending,
         ])->layout('admin::layouts.app', ['title' => __(\Str::plural('Lab')) ]);
     }
 }

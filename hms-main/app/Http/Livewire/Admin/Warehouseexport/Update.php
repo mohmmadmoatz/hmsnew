@@ -29,11 +29,18 @@ class Update extends Component
     public $unit;
     public $qtyInput;
     public $expout;
-    
+
+    // ليكاشور و باكات العملية (فقط اذا القائمة مربوطة بعملية)
+    public $isOperation = false;
+    public $ligasure_count = 0;
+    public $pack_count = 0;
+
 
 
     protected $rules = [
-        'name' => 'required',        'date' => 'required',        
+        'name' => 'required',        'date' => 'required',
+        'ligasure_count' => 'nullable|integer|min:0',
+        'pack_count' => 'nullable|integer|min:0',
     ];
 
     public function addItem()
@@ -71,7 +78,15 @@ class Update extends Component
         $this->totalmenu = $this->warehouseexport->totalmenu;   
         
         
-        $this->menu_no = $this->warehouseexport->menu_no;   
+        $this->menu_no = $this->warehouseexport->menu_no;
+
+        $op = $this->warehouseexport->opid ? OperationHold::find($this->warehouseexport->opid) : null;
+        if($op){
+            $this->isOperation = true;
+            $this->ligasure_count = $op->ligasure_count ?? 0;
+            $this->pack_count = $op->pack_count ?? 0;
+        }
+
         $this->items =  WarehouseExportItem::where("export_id",$this->warehouseexport->id)->get();
         
         $this->items  = $this->items->toarray();   
@@ -113,6 +128,8 @@ class Update extends Component
 
         if($op){
             $op->outexp = $this->expout;
+            $op->ligasure_count = (int) $this->ligasure_count;
+            $op->pack_count = (int) $this->pack_count;
             $op->save();
         }
 

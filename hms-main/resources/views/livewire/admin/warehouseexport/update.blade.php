@@ -45,7 +45,21 @@
                     <label for="">رقم القائمة</label>
                     <input type="text" class="form-control" wire:model.lazy="menu_no">
                 </div>
-           
+
+                @if($isOperation)
+                <div class="col-md-4">
+                    <label for="">عدد الليكاشور</label>
+                    <input type="number" min="0" class="form-control @error('ligasure_count') is-invalid @enderror" wire:model.lazy="ligasure_count">
+                    @error('ligasure_count') <div class='invalid-feedback'>{{ $message }}</div> @enderror
+                </div>
+
+                <div class="col-md-4">
+                    <label for="">عدد الباكات</label>
+                    <input type="number" min="0" class="form-control @error('pack_count') is-invalid @enderror" wire:model.lazy="pack_count">
+                    @error('pack_count') <div class='invalid-feedback'>{{ $message }}</div> @enderror
+                </div>
+                @endif
+
                 <div class="col-md-12">
                     <table class="table table-bordered ">
                         <thead>

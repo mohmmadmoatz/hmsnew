@@ -35,6 +35,9 @@ class Exp extends Component
 
     public $opinfo;
 
+    public $ligasure_count = 0;
+    public $pack_count = 0;
+
     public $queryString = ['opid'];
 
 
@@ -43,13 +46,17 @@ class Exp extends Component
         $this->opinfo = OperationHold::find($this->opid);
         $this->date = $this->opinfo->date;
         $this->name = "عمليات : " . $this->opinfo->payment_number;
+        $this->ligasure_count = $this->opinfo->ligasure_count ?? 0;
+        $this->pack_count = $this->opinfo->pack_count ?? 0;
 
 
 
     }
 
     protected $rules = [
-        'name' => 'required',        'date' => 'required',        
+        'name' => 'required',        'date' => 'required',
+        'ligasure_count' => 'nullable|integer|min:0',
+        'pack_count' => 'nullable|integer|min:0',
     ];
 
     public function addItem()
@@ -121,6 +128,8 @@ class Exp extends Component
 
         $this->opinfo->outexp = $this->totalmenu;
         $this->opinfo->ware_id = $menu->id;
+        $this->opinfo->ligasure_count = (int) $this->ligasure_count;
+        $this->opinfo->pack_count = (int) $this->pack_count;
         $this->opinfo->save();
 
         foreach ($this->items as $item) {

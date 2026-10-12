@@ -50,6 +50,32 @@
                 </div>
             </div>
 
+            @if($patient_id && count($pending))
+            <div class="card-body table-responsive p-0">
+                <h5 class="px-3 pt-2">فحوصات مطلوبة (بدون نتيجة بعد)</h5>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>التاريخ</th>
+                        <th>الفحوصات</th>
+                        <th>الحالة</th>
+                    </tr>
+                    @foreach($pending as $p)
+                    <tr>
+                        <td>{{ $p['date'] }}</td>
+                        <td>{{ $p['tests'] }}</td>
+                        <td>
+                            <span class="badge {{ $p['status'] == 'بانتظار الدفع' ? 'badge-danger' : 'badge-warning' }}">{{ $p['status'] }}</span>
+                        </td>
+                    </tr>
+                    @endforeach
+                </table>
+            </div>
+            @endif
+
+            @if($patient_id && !count($pending) && !$labs->total())
+            <div class="alert alert-info m-3">لا توجد فحوصات لهذا المريض</div>
+            @endif
+
             <div class="card-body table-responsive p-0">
                 <table class="table table-hover">
                     <tbody>
