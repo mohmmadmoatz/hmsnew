@@ -108,6 +108,7 @@ $date2 = explode(" - ", $dates)[1];
                     <th>رقم الوصل</th>
                     <th>التاريخ</th>
                     <th>اسم المريض</th>
+                    <th>اطباء التخدير</th>
                     <th>اجور المخدر</th>
                     <th>مبلغ العملية</th>
                     <th>العملية</th>
@@ -119,7 +120,8 @@ $date2 = explode(" - ", $dates)[1];
                   <td>{{$item->payment_number}}</td>
                     <td>{{$item->date}}</td>
                     <td>{{$item->patient->name}}</td>
-                  
+                    <td>{{$item->anesthesia_names}}</td>
+
                     <td>
                         @convert($item->m5dr) د.ع
                      
@@ -129,7 +131,7 @@ $date2 = explode(" - ", $dates)[1];
                 </tr>
                 @endforeach
                 <tr>
-                    <td colspan="3">المجموع</td>
+                    <td colspan="4">المجموع</td>
                     <td style="font-weight: bold;">
                         @convert($data->sum("m5dr")) د.ع
                         

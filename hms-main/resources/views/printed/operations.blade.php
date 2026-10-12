@@ -110,6 +110,7 @@
                     <th>المريض</th>
                     <th>الطبيب</th>
                     <th>اسم العملية</th>
+                    <th>اطباء التخدير</th>
                     <th>ليكاشور</th>
                     <th>باك</th>
 
@@ -123,12 +124,13 @@
                     <td> {{ $item->doctor->name ?? "" }} </td>
 
                     <td> {{$item->operation_name}} </td>
+                    <td> {{ $item->anesthesia_names }} </td>
                     <td> {{ $item->ligasure_count ?? 0 }} </td>
                     <td> {{ $item->pack_count ?? 0 }} </td>
 </tr>
 @endforeach
                 <tr>
-                    <th colspan="5">المجموع</th>
+                    <th colspan="6">المجموع</th>
                     <th>{{ $data->sum('ligasure_count') }}</th>
                     <th>{{ $data->sum('pack_count') }}</th>
                 </tr>

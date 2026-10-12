@@ -116,7 +116,8 @@ table.table-fit tbody td, table.table-fit tfoot td {
                         <td style='cursor: pointer' wire:click="sort('patinet_id')"> <i class='fa @if($sortType == 'desc' and $sortColumn == 'patinet_id') fa-sort-amount-down ml-2 @elseif($sortType == 'asc' and $sortColumn == 'patinet_id') fa-sort-amount-up ml-2 @endif'></i> {{ __('المريض') }} </td>
                         <td class="fit" style='cursor: pointer' wire:click="sort('doctor_id')"> <i class='fa @if($sortType == 'desc' and $sortColumn == 'doctor_id') fa-sort-amount-down ml-2 @elseif($sortType == 'asc' and $sortColumn == 'doctor_id') fa-sort-amount-up ml-2 @endif'></i> {{ __('الطبيب') }} </td>
                         <td style='cursor: pointer' wire:click="sort('operation_name')"> <i class='fa @if($sortType == 'desc' and $sortColumn == 'operation_name') fa-sort-amount-down ml-2 @elseif($sortType == 'asc' and $sortColumn == 'operation_name') fa-sort-amount-up ml-2 @endif'></i> {{ __('اسم العملية') }} </td>
-                        
+                        <td>اطباء التخدير</td>
+
                         <td>مصاريف العملية</td>
 
                         @if(config('easy_panel.crud.operationhold.delete') or config('easy_panel.crud.operationhold.update'))
@@ -133,6 +134,7 @@ table.table-fit tbody td, table.table-fit tfoot td {
                     <td> {{ $rd->Patient->name ?? "" }} <span class="badge badge-danger">غير مدفوع</span> </td>
                     <td> {{ $rd->Patient->doctor->name ?? "" }} </td>
                     <td> {{ $rd->Patient->operation->name ?? "" }} </td>
+                    <td> <small class="text-muted">بعد الدفع</small> </td>
                     <td> <small class="text-muted">بعد الدفع</small> </td>
                     <td>
                         <a  href="@route(getRouteName().'.lab.read')?patient_id={{$rd->Patient->id??''}}" target="_blank" >الفحوصات</a>
@@ -155,6 +157,9 @@ table.table-fit tbody td, table.table-fit tfoot td {
                     <td> {{ $operationhold->doctor->name ?? "" }} </td>
 
                     <td> {{$operationhold->operation_name}} </td>
+                    <td>
+                        @livewire('admin.operationhold.anesthesia', ['opid' => $operationhold->id], key('anes-'.$operationhold->id))
+                    </td>
 
                     <td>
                     @if(!$operationhold->ware_id)
@@ -208,6 +213,12 @@ table.table-fit tbody td, table.table-fit tfoot td {
             <div class="m-auto pt-3 pr-3">
                 {{ $operationholds->appends(request()->query())->links() }}
             </div>
+
+            <datalist id="anesthesia-names">
+                @foreach($anesthesiaNames as $name)
+                <option value="{{ $name }}">
+                @endforeach
+            </datalist>
 
         </div>
     </div>

@@ -152,6 +152,13 @@
     </td>
 
     <td> 
+        @if($operationhold->anesthesia_doctors)
+        <div class="mb-1">
+            @foreach($operationhold->anesthesia_doctors as $anesName)
+            <span class="badge badge-info">{{ $anesName }}</span>
+            @endforeach
+        </div>
+        @endif
         @if(!$operationhold->m5dr_selected && $operationhold->m5dr !=0)
        <button  @click.prevent="m5drisopen = true" class="btn btn-danger"> نوع العملية</button> 
        <div x-show="m5drisopen" class="cs-modal animate__animated animate__fadeIn">

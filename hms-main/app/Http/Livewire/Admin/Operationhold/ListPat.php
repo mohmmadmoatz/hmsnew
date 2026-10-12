@@ -171,10 +171,16 @@ class ListPat extends Component
 
         $doctors = User::where("user_type","doctor")->orderBy("name")->get();
 
+        // اقتراحات اسماء اطباء التخدير من العمليات السابقة
+        $anesthesiaNames = OperationHold::whereNotNull("anesthesia_doctors")
+            ->latest("id")->limit(500)->get(["id","anesthesia_doctors"])
+            ->pluck("anesthesia_doctors")->flatten()->filter()->unique()->sort()->values();
+
         return view('livewire.admin.operationhold.list', [
             'operationholds' => $data,
             'unpaid' => $unpaid,
             'doctors' => $doctors,
+            'anesthesiaNames' => $anesthesiaNames,
 
         ])->layout('admin::layouts.app', ['title' => "عمليات" ]);
     }

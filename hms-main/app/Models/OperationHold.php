@@ -12,6 +12,16 @@ class OperationHold extends Model
 
     protected $withs = ["ambdoctor"];
 
+    protected $casts = [
+        'anesthesia_doctors' => 'array',
+    ];
+
+    // اسماء اطباء التخدير مفصولة بفارزة للعرض
+    public function getAnesthesiaNamesAttribute()
+    {
+        return implode(" ، ", $this->anesthesia_doctors ?? []);
+    }
+
     public function Patient()
     {
         return $this->belongsTo("App\Models\Patient",'patinet_id');
